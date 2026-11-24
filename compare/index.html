@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TogetherBed Comparison</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Allison&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f6f4f8; --bg-deep:#ebe6f0; --card:#fff; --ink:#2b2630; --muted:#6b6372; --line:rgba(43,38,48,.1);
+    --plum:#7b6888; --plum-deep:#4e4058; --plum-soft:#efe9f3; --pink:#c79ab6; --blue:#8fb2cf;
+    --good:#3f8f6b; --good-bg:#e6f3ec; --part:#b07b2c; --part-bg:#f8efe0; --no:#a3a0a8; --no-bg:#f1eff3;
+    --f-sans:"Jost","Avenir Next","Segoe UI",system-ui,sans-serif; --f-script:"Allison","Segoe Script",cursive; --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+    --tb-col:minmax(0,1.18fr);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:var(--f-sans);color:var(--ink);-webkit-font-smoothing:antialiased;
+    background:radial-gradient(80% 60% at 50% 0%, #fff 0%, var(--bg) 55%, var(--bg-deep) 100%);min-height:100vh}
+  button{font:inherit;color:inherit}
+  :focus-visible{outline:2px solid var(--plum);outline-offset:3px}
+  .wrap{max-width:1180px;margin:0 auto;padding:clamp(28px,5vw,64px) clamp(16px,4vw,40px) clamp(40px,6vw,80px)}
+
+  /* Heading */
+  .head{text-align:center;max-width:720px;margin:0 auto clamp(26px,4vw,44px)}
+  .head .script{font-family:var(--f-script);font-size:clamp(48px,6vw,68px);line-height:.8;color:var(--plum);display:block}
+  .head h1{font-size:clamp(30px,4.4vw,50px);font-weight:500;letter-spacing:-.02em;line-height:1.05;margin:6px 0 14px}
+  .head p{font-size:clamp(15px,1.5vw,17.5px);line-height:1.6;color:var(--muted);margin:0}
+
+  /* Priorities */
+  .prio{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;margin:0 auto clamp(22px,3vw,34px)}
+  .prio span{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-right:4px}
+  .prio button{font-size:14px;padding:8px 15px;border-radius:999px;border:1px solid var(--line);background:#fff;cursor:pointer;transition:background .25s,color .25s,border-color .25s,box-shadow .25s}
+  .prio button:hover{border-color:var(--plum)}
+  .prio button[aria-pressed="true"]{background:var(--plum);border-color:var(--plum);color:#fff;box-shadow:0 8px 20px -10px rgba(78,64,88,.7)}
+
+  /* Grid */
+  .cmp{display:grid;grid-template-columns:minmax(150px,.95fr) var(--tb-col) minmax(0,1fr) minmax(0,1fr);position:relative}
+  .col-hl{position:absolute;border-radius:26px;background:#fff;
+    box-shadow:0 40px 80px -40px rgba(78,64,88,.55),0 0 0 1.5px rgba(123,104,136,.35);pointer-events:none;z-index:0}
+  .cmp > *:not(.col-hl){position:relative;z-index:1}
+
+  .prod{padding:22px 16px 18px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
+  .prod .badge{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#fff;background:linear-gradient(90deg,var(--pink),var(--plum) 55%,var(--blue));
+    padding:5px 11px;border-radius:999px;margin:6px 0 4px;box-shadow:0 10px 20px -10px rgba(78,64,88,.8)}
+  .prod .brand{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .prod .name{font-size:clamp(17px,1.7vw,21px);font-weight:500;line-height:1.2;min-height:2.4em;display:flex;align-items:center}
+  .logo{display:inline-flex;align-items:center;gap:5px;font-weight:300;font-size:clamp(22px,2.2vw,27px);letter-spacing:-.01em}
+  .logo em{font-style:normal;font-weight:500;border:2px solid currentColor;border-radius:9px;padding:0 6px;line-height:1.15}
+  .price{font-size:clamp(26px,2.8vw,34px);font-weight:500;letter-spacing:-.02em;line-height:1}
+  .price small{display:block;font-size:12px;font-weight:400;color:var(--muted);letter-spacing:0;margin-top:6px}
+  .save{font-size:12.5px;color:var(--good);background:var(--good-bg);padding:4px 10px;border-radius:999px;margin-top:4px}
+
+  /* Zone playground */
+  .bedviz{width:100%;max-width:170px;margin:10px auto 2px}
+  .bedviz svg{width:100%;height:auto;display:block;overflow:visible}
+  .bedviz .tile{cursor:pointer;transition:fill .35s}
+  .bedviz .tile:hover{filter:brightness(.96)}
+  .vizcap{font-size:12px;color:var(--muted);min-height:2.6em;line-height:1.35;transition:color .3s}
+  .vizcap.flash{color:var(--plum-deep)}
+  .tryhint{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--plum)}
+
+  /* Rows */
+  .rl,.cell{padding:16px 14px;border-top:1px solid var(--line);transition:background .3s,opacity .3s}
+  .rl{display:flex;flex-direction:column;justify-content:center;gap:3px;text-align:left;background:none;border-left:0;border-right:0;border-bottom:0;cursor:pointer}
+  .rl b{font-weight:500;font-size:15px;display:flex;align-items:center;gap:8px}
+  .rl b i{width:7px;height:7px;border-right:1.5px solid var(--muted);border-bottom:1.5px solid var(--muted);transform:rotate(45deg) translate(-2px,-2px);transition:transform .25s;flex:0 0 auto}
+  .rl[aria-expanded="true"] b i{transform:rotate(-135deg)}
+  .rl small{font-size:12.5px;color:var(--muted);line-height:1.4}
+  .cell{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:6px;font-size:14px;line-height:1.35}
+  .cell .t{color:var(--ink)}
+  .cell .t.dim{color:var(--muted)}
+  .mark{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto}
+  .mark svg{width:15px;height:15px}
+  .mark.y{background:var(--good-bg);color:var(--good)}
+  .mark.p{background:var(--part-bg);color:var(--part)}
+  .mark.n{background:var(--no-bg);color:var(--no)}
+  .tb .mark.y{background:var(--good);color:#fff;box-shadow:0 6px 14px -6px rgba(63,143,107,.8)}
+  .detail{grid-column:1 / -1;display:none;padding:0 14px 18px;font-size:13.5px;color:var(--muted);line-height:1.55}
+  .detail.open{display:block}
+  .detail .dg{display:grid;grid-template-columns:minmax(150px,.95fr) var(--tb-col) minmax(0,1fr) minmax(0,1fr);gap:0}
+  .detail .dg div{padding:0 14px}
+  .row-off{display:none !important}
+
+  /* Ways-to-tune bar */
+  .ways{width:100%;max-width:200px}
+  .ways .n{font-size:26px;font-weight:500;letter-spacing:-.02em;line-height:1}
+  .ways .bar{height:8px;border-radius:999px;background:var(--no-bg);margin-top:8px;overflow:hidden}
+  .ways .bar i{display:block;height:100%;border-radius:999px;width:0;background:var(--no);transition:width 1.4s cubic-bezier(.2,.8,.2,1)}
+  .tb .ways .bar i{background:linear-gradient(90deg,var(--pink),var(--plum),var(--blue))}
+
+  /* Footer */
+  .cta{display:flex;flex-direction:column;align-items:center;gap:10px;padding:22px 14px 26px;border-top:1px solid var(--line)}
+  .btn{display:inline-flex;align-items:center;gap:8px;font-weight:500;font-size:15px;text-decoration:none;white-space:nowrap;padding:12px 22px;border-radius:999px;
+    border:1px solid transparent;cursor:pointer;background:var(--plum);color:#fff;transition:background .2s,transform .2s}
+  .btn:hover{background:var(--plum-deep);transform:translateY(-1px)}
+  .ghost{font-size:13px;color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line)}
+  .ghost:hover{color:var(--plum)}
+  .score{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .score b{font-family:var(--f-sans);font-size:20px;font-weight:500;color:var(--ink);letter-spacing:0;margin-right:4px}
+  .tb .score b{color:var(--plum)}
+  .note{max-width:820px;margin:clamp(26px,3vw,38px) auto 0;text-align:center;font-size:12px;line-height:1.6;color:var(--muted)}
+  .note a{color:inherit}
+
+  /* Phones: product columns stay side by side, row labels go above */
+  @media (max-width:760px){
+    :root{--tb-col:minmax(0,1.1fr)}
+    .cmp{grid-template-columns:var(--tb-col) minmax(0,1fr) minmax(0,1fr)}
+    .col-hl{border-radius:20px}
+    .corner{display:none}
+    .rl{grid-column:1 / -1;padding:14px 4px 4px;border-top:1px solid var(--line)}
+    .rl small{display:none}
+    .cell{border-top:0;padding:8px 6px 14px;font-size:12.5px}
+    .prod{padding:18px 6px 14px}
+    .prod .badge{font-size:9.5px;padding:4px 9px;margin-top:4px}
+    .prod .name{font-size:14px}
+    .logo{font-size:18px}.logo em{border-width:1.5px;border-radius:7px;padding:0 4px}
+    .price{font-size:21px}
+    .price small{font-size:10.5px}
+    .save{font-size:10.5px;padding:3px 7px}
+    .vizcap{font-size:10.5px}
+    .bedviz{max-width:110px}
+    .ways .n{font-size:20px}
+    .mark{width:24px;height:24px}
+    .detail .dg{grid-template-columns:var(--tb-col) minmax(0,1fr) minmax(0,1fr)}
+    .detail .dg div{padding:0 6px;font-size:12px}
+    .detail .dg .dl{display:none}
+    .cta{padding:16px 4px 20px}.cta .btn{padding:9px 10px;font-size:12.5px;white-space:normal;text-align:center;justify-content:center;line-height:1.25;max-width:100%}
+    .prod .badge{white-space:nowrap;letter-spacing:.06em}
+    .cta .ghost{font-size:11.5px;text-align:center}
+    .score b{font-size:16px}
+  }
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important} }
+
+  /* ---------- Site header (matches the home page) ---------- */
+  :root{--head-h:66px;--ct:0px;--vis:100vh}
+  .top{position:sticky;top:0;z-index:20;height:var(--head-h);display:flex;align-items:center;gap:28px;padding:0 clamp(16px,4vw,48px);
+    background:rgba(246,244,248,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .hlogo{display:flex;align-items:center;gap:6px;text-decoration:none;font-weight:300;font-size:26px;letter-spacing:-.01em;color:var(--ink)}
+  .hlogo em{font-style:normal;font-weight:500;border:2px solid currentColor;border-radius:9px;padding:0 6px;line-height:1.15}
+  .nav{display:flex;gap:26px;margin-left:auto}
+  .nav a{font-size:15px;text-decoration:none;color:var(--muted)}
+  .nav a:hover,.nav a[aria-current]{color:var(--plum)}
+  .top .btn{padding:11px 20px}
+  @media (max-width:900px){ .nav{display:none} }
+  @media (max-width:560px){ :root{--head-h:58px} .hlogo{font-size:22px} .top .btn{padding:8px 14px;font-size:14px} }
+  .mm-img svg{position:absolute;inset:0;width:100%;height:100%}
+  .nav{align-items:center}
+  .mm-t{font:inherit;font-size:15px;color:var(--muted);background:none;border:0;padding:8px 0;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+  .mm-t i{width:6px;height:6px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:translateY(-2px) rotate(45deg);transition:transform .25s}
+  .mm-t:hover,.mm-t[aria-expanded="true"]{color:var(--plum)}
+  .mm-t[aria-expanded="true"] i{transform:translateY(1px) rotate(-135deg)}
+  .mm-burger{display:none;width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:#fff;cursor:pointer;position:relative;flex:0 0 auto}
+  .mm-burger span,.mm-burger span::before,.mm-burger span::after{position:absolute;left:12px;right:12px;height:1.6px;background:var(--ink);border-radius:2px;transition:transform .25s,opacity .2s;content:""}
+  .mm-burger span{top:20px}.mm-burger span::before{left:0;right:0;top:-6px}.mm-burger span::after{left:0;right:0;top:6px}
+  .mm-burger[aria-expanded="true"] span{background:transparent}
+  .mm-burger[aria-expanded="true"] span::before{transform:translateY(6px) rotate(45deg)}
+  .mm-burger[aria-expanded="true"] span::after{transform:translateY(-6px) rotate(-45deg)}
+  .mm-scrim{position:fixed;left:0;right:0;bottom:0;top:calc(var(--ct) + var(--head-h));z-index:18;background:rgba(43,38,48,.18);opacity:0;pointer-events:none;transition:opacity .25s}
+  .mm-scrim.on{opacity:1;pointer-events:auto}
+  .mm{position:fixed;left:0;right:0;top:calc(var(--ct) + var(--head-h));z-index:19;background:rgba(255,255,255,.97);
+    -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-bottom:1px solid var(--line);
+    box-shadow:0 34px 70px -34px rgba(60,40,80,.45);opacity:0;transform:translateY(-10px);pointer-events:none;transition:opacity .22s,transform .26s cubic-bezier(.2,.8,.2,1);
+    max-height:calc(var(--vis) - var(--head-h));overflow:auto;overscroll-behavior:contain}
+  .mm.open{opacity:1;transform:none;pointer-events:auto}
+  .mm-in{max-width:1320px;margin:0 auto;padding:30px clamp(16px,4vw,48px) 34px}
+  .mm-g{display:none;grid-template-columns:minmax(220px,270px) 1fr;gap:clamp(24px,3vw,44px);align-items:start}
+  .mm-g.on{display:grid}
+  .mm-intro .script{font-family:var(--f-script);font-size:44px;line-height:.9;color:var(--plum);display:block}
+  .mm-intro h3{font-size:26px;font-weight:500;letter-spacing:-.01em;margin:4px 0 10px}
+  .mm-intro p{font-size:14.5px;line-height:1.55;color:var(--muted);margin:0 0 16px}
+  .mm-all{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:var(--plum);text-decoration:none;
+    padding:9px 16px;border-radius:999px;border:1px solid rgba(123,104,136,.35);transition:background .2s,color .2s}
+  .mm-all:hover{background:var(--plum);color:#fff}
+  .mm-grid{display:grid;gap:16px;grid-template-columns:repeat(5,minmax(0,1fr))}
+  .mm-grid.n2{grid-template-columns:repeat(2,minmax(0,1fr));max-width:720px}.mm-grid.n3{grid-template-columns:repeat(3,minmax(0,1fr))}.mm-grid.n4{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .mm-card{display:flex;flex-direction:column;gap:5px;text-decoration:none;color:var(--ink);border-radius:16px;padding:8px 8px 10px;transition:background .2s}
+  .mm-card:hover,.mm-card:focus-visible{background:#f6f3f8}
+  .mm-img{position:relative;display:block;aspect-ratio:24/17;border-radius:12px;overflow:hidden;margin-bottom:6px;
+    background:linear-gradient(100deg,#efebf3 30%,#faf8fc 50%,#efebf3 70%);background-size:220% 100%;animation:mmsh 1.4s linear infinite;
+    box-shadow:inset 0 0 0 1px rgba(43,38,48,.06)}
+  .mm-img.has{animation:none;background:#f3f0f6}
+  .mm-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s,transform .5s cubic-bezier(.2,.8,.2,1)}
+  .mm-img.has img{opacity:1}
+  .mm-card:hover .mm-img img{transform:scale(1.05)}
+  .mm-img em{position:absolute;left:8px;top:8px;font-style:normal;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.06em;
+    background:rgba(255,255,255,.85);color:var(--muted);padding:2px 7px;border-radius:999px}
+  .mm-soon{position:absolute;right:8px;top:8px;font-style:normal;font-family:var(--f-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#fff;
+    background:linear-gradient(90deg,#c79ab6,#7b6888 55%,#8fb2cf);padding:3px 8px;border-radius:999px;box-shadow:0 6px 14px -8px rgba(78,64,88,.8)}
+  .mm-card b{font-weight:500;font-size:15px}
+  .mm-card small{font-size:13px;line-height:1.4;color:var(--muted)}
+  @keyframes mmsh{from{background-position:120% 0}to{background-position:-120% 0}}
+  @media (max-width:1100px){ .mm-grid{grid-template-columns:repeat(3,minmax(0,1fr))} .mm-grid.n4{grid-template-columns:repeat(2,minmax(0,1fr))} }
+  @media (max-width:900px){
+    .mm-burger{display:block}
+    .top{gap:10px}
+    .top .btn{margin-left:auto}
+    .mm-in{padding:18px 16px 28px}
+    .mm.all .mm-g{display:block;margin-bottom:26px}
+    .mm-intro .script{font-size:34px}.mm-intro h3{font-size:21px;margin:2px 0 6px}.mm-intro p{font-size:13.5px;margin-bottom:12px}
+    .mm-grid,.mm-grid.n3,.mm-grid.n4{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}
+    .mm-card{padding:6px}.mm-card b{font-size:14px}.mm-card small{font-size:12px}
+  }
+  @media (max-width:520px){ .top .hlogo{font-size:21px} .top .btn{padding:8px 12px;font-size:13.5px} .mm-burger{width:38px;height:38px} .mm-burger span,.mm-burger span::before,.mm-burger span::after{left:10px;right:10px} .mm-burger span{top:18px} .mm-burger span::before,.mm-burger span::after{left:0;right:0} }
+  @media (prefers-reduced-motion: reduce){ .mm,.mm-img img,.mm-t i{transition:none} .mm-img{animation:none} }
+</style>
+</head>
+<body>
+<header class="top" id="top">
+  <a class="hlogo" href="https://becausemarketing.wixstudio.com/togetherbed" target="_top" data-home-ch="0">together <em>bed</em></a>
+  <nav class="nav" aria-label="Main">
+    <a href="https://becausemarketing.wixstudio.com/togetherbed" target="_top" data-home-ch="1">The problem</a>
+    <button type="button" class="mm-t" data-mm="how" aria-expanded="false" aria-controls="mm-how">How it works<i aria-hidden="true"></i></button>
+    <button type="button" class="mm-t" data-mm="ed" aria-expanded="false" aria-controls="mm-ed">Editions<i aria-hidden="true"></i></button>
+    <a href="#top" aria-current="page">Compare</a>
+    <button type="button" class="mm-t" data-mm="make" aria-expanded="false" aria-controls="mm-make">Make your bed<i aria-hidden="true"></i></button>
+  </nav>
+  <a class="btn" href="https://becausemarketing.wixstudio.com/togetherbed" target="_top" data-home-ch="9">Design your bed</a>
+  <button type="button" class="mm-burger" aria-expanded="false" aria-controls="mm" aria-label="Menu"><span></span></button>
+</header>
+<div class="mm-scrim" id="mmScrim"></div>
+<div class="mm" id="mm"><div class="mm-in"></div></div>
+<main class="wrap">
+  <header class="head">
+    <span class="script">Compare</span>
+    <h1>One bed, tuned for two.</h1>
+    <p>Most premium beds let each side pick a firmness. TogetherBed goes further: every sleeper gets three zones, for shoulders, hips and legs, with comfort and support chosen separately, in the material they prefer.</p>
+  </header>
+
+  <div class="prio" role="group" aria-label="What matters most to you?">
+    <span>What matters most?</span>
+    <button type="button" data-p="all" aria-pressed="true">Everything</button>
+    <button type="button" data-p="fit" aria-pressed="false">Personal fit</button>
+    <button type="button" data-p="mat" aria-pressed="false">Material choice</button>
+    <button type="button" data-p="last" aria-pressed="false">Lasting value</button>
+    <button type="button" data-p="price" aria-pressed="false">Price</button>
+  </div>
+
+  <div class="cmp" id="cmp" role="table" aria-label="TogetherBed compared with two premium mattresses">
+    <div class="col-hl" aria-hidden="true"></div>
+    <!-- product headers are filled in below -->
+  </div>
+
+  <p class="note">Queen prices and features as listed on each brand's own site in October 2026:
+    <a href="https://bedgear.com/products/m5-night-ice-performance-mattress?variant=57243504246924" target="_blank" rel="noopener">BEDGEAR M5 Night Ice Performance®</a> ·
+    <a href="https://www.naturepedic.com/products/eos-pillowtop-organic-mattress-buy?variant=53251000926526" target="_blank" rel="noopener">Naturepedic EOS Pillowtop</a>.
+    Prices and features can change; check each site for current details. BEDGEAR and Naturepedic are trademarks of their respective owners.</p>
+</main>
+
+<script>
+/* ---------- Data ---------- */
+const LINKS = { shop: "#", design: "https://becausemarketing.wixstudio.com/togetherbed" };   // TogetherBed links on your site (Design opens the home page at "Make your bed")
+const P = [
+  { id: "tb", brand: "TogetherBed", name: null, price: 3999, link: LINKS.shop },
+  { id: "bg", brand: "BEDGEAR", name: "M5 Night Ice Performance®", price: 4499, link: "https://bedgear.com/products/m5-night-ice-performance-mattress?variant=57243504246924" },
+  { id: "np", brand: "Naturepedic", name: "EOS Pillowtop", price: 4999, link: "https://www.naturepedic.com/products/eos-pillowtop-organic-mattress-buy?variant=53251000926526" }
+];
+// y = yes, p = partly, n = no; text shown under the mark; tags = which priority the row belongs to
+const ROWS = [
+  { k: "ways", tags: ["fit"], label: "Ways to tune each side", sub: "Every combination one sleeper can choose",
+    cells: [{ ways: 729, t: "3 zones × 3 comfort × 3 support" }, { ways: 4, t: "4 coil firmness levels" }, { ways: 5, t: "5 firmness levels" }],
+    more: ["Each zone pairs a comfort cube (Plush, Medium, Firm) with a coil cube (Medium, Firm, Extra Firm): 9 options per zone, 9 × 9 × 9 = 729 per side.",
+           "Four firmness levels per side (Firm to Plush), set by swapping the suspension units: the coil support system, not a comfort layer.",
+           "Five firmness levels per side, from Ultra-Plush to Firm."] },
+  { k: "comfort", tags: ["fit"], label: "Comfort", sub: "How the bed feels, for each sleeper",
+    cells: [{ m: "y", t: "Zoned for each sleeper" }, { m: "n", t: "One comfort layer for both" }, { m: "p", t: "Per sleeper, one firmness (not zoned)" }],
+    more: ["Each sleeper picks Plush, Medium or Firm comfort cubes for their shoulders, hips and legs. Broad shoulders or wider hips get more pressure relief, without changing the rest of the bed.",
+           "One comfort layer runs across the whole bed, the same for both sleepers.",
+           "Each side can have its own firmness, but it is the same from head to foot."] },
+  { k: "support", tags: ["fit"], label: "Support", sub: "How the bed holds each sleeper up",
+    cells: [{ m: "y", t: "Zoned for each sleeper, and changeable" }, { m: "p", t: "Per sleeper, not zoned" }, { m: "n", t: "One support core for both" }],
+    more: ["Each sleeper picks Medium, Firm or Extra Firm coil cubes for each zone, separately from comfort, and can change them later as their body changes.",
+           "Each side gets its own suspension units, the same from head to foot. Because firmness is set through these support coils, a softer feel also means softer support.",
+           "One 8″ encased-coil support core runs under both sleepers."] },
+  { k: "mat", tags: ["mat"], label: "Choice of comfort material", sub: "Latex or memory foam, your call",
+    cells: [{ m: "y", t: "Natural latex or HD memory foam" }, { m: "n", t: "Performance foam only; can’t be changed" }, { m: "n", t: "Organic latex only; can’t be changed" }],
+    more: ["Two editions: Naturals (natural latex, natural & cotton cover with lambs' wool) or Performance (HD memory foam, cooling stretch cover).",
+           "One build: cooling performance foams with a Ver-Tex cooling cover.",
+           "One build: organic latex layers with an organic cotton and wool quilt."] },
+  { k: "cover", tags: ["mat"], label: "Cover choice", sub: "Cooling or natural, and changeable",
+    cells: [{ m: "y", t: "Cooling knit or organic, and you can change it" }, { m: "n", t: "Performance cover only; can’t be changed" }, { m: "n", t: "Natural cover only; can’t be changed" }],
+    more: ["Choose a performance 4-way stretch knit cooling cover or a natural, organic breathable cover, and switch to the other later if your needs change.",
+           "Comes with a performance cooling cover (Ver-Tex). There is no natural option, and the cover can’t be swapped.",
+           "Comes with a natural organic cotton, wool and PLA quilt. There is no performance option, and the cover can’t be swapped."] },
+  { k: "move", tags: ["fit", "last"], label: "Rearrange as your body changes", sub: "Move cubes to new zones",
+    cells: [{ m: "y", t: "Swap cubes between zones" }, { m: "n", t: "No zones to rearrange" }, { m: "n", t: "No zones to rearrange" }],
+    more: ["Cubes can move to new positions as they wear or as your body changes. We send reminders when it's time to rotate, flip or replace a component.",
+           "Firmness can change per side by swapping suspension units.", "Comfort layers can be exchanged (free in the first 100 nights)."] },
+  { k: "replace", tags: ["last", "price"], label: "Replace one worn piece", sub: "Not the whole mattress",
+    cells: [{ m: "y", t: "Any single cube or layer" }, { m: "p", t: "Suspension units only" }, { m: "p", t: "Comfort layers only" }],
+    more: ["When something wears out, you replace that piece, not the whole mattress. The bed comes apart in seconds, so recycling is fast and easy.",
+           "Suspension units are interchangeable.", "Layers zip into an organic cotton encasement and can be exchanged."] },
+  { k: "core", tags: [], label: "Coil system", sub: "What's underneath",
+    cells: [{ t: "8″ TriZoned quad coil cubes" }, { t: "Independent suspension units" }, { t: "8″ encased coils" }],
+    more: ["Six coil cubes per bed, three per sleeper, each in Medium, Firm or Extra Firm.", "Interchangeable coil units in four firmness levels.", "Individually encased coils."] },
+  { k: "price", tags: ["price"], label: "Queen price", sub: "Before any promotions",
+    cells: [{ price: 3999 }, { price: 4499 }, { price: 4999 }],
+    more: ["Queen 60″ × 80″.", "Queen, as listed.", "Queen 60″ × 80″, as listed."] }
+];
+const ICON = {
+  y: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg>',
+  p: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 8h8"/></svg>',
+  n: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 5l6 6M11 5l-6 6"/></svg>'
+};
+const MLABEL = { y: "Yes", p: "Partly", n: "No" };
+const money = v => "$" + v.toLocaleString("en-US", { minimumFractionDigits: v % 1 ? 2 : 0, maximumFractionDigits: 2 });
+
+/* ---------- Zone playground (top-down beds) ---------- */
+const SHADES = { tb: ["#ece6f0", "#b3a3c0", "#6b5a78"], bg: ["#e9edf3", "#c5cfdc", "#9badc3", "#6f86a3"], np: ["#f3efe6", "#e4dccb", "#d2c6ad", "#bcae90", "#a3936f"] };
+const LEVELS = { tb: ["Plush", "Medium", "Firm"], bg: ["Plush", "Medium Plush", "Medium Firm", "Firm"], np: ["Ultra-Plush", "Plush", "Medium", "Cushion-Firm", "Firm"] };
+const ZN = ["shoulders", "hips", "legs"];
+const state = { tb: [[0, 1, 0], [1, 2, 1]], bg: [1, 2], np: [2, 3] };   // tb: per side, per zone; others: per side
+function bedSVG(id) {
+  const W = 120, H = 160, x0 = 8, y0 = 10, w = (W - 16) / 2, h = (H - 22);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${id === "tb" ? "Six zones, tap to change" : "Two sides, tap to change"}">`;
+  s += `<rect x="2" y="4" width="${W - 4}" height="${H - 8}" rx="9" fill="#5d5864"/>`;                    // the base
+  for (let side = 0; side < 2; side++) {
+    if (id === "tb") for (let z = 0; z < 3; z++) {
+      s += `<rect class="tile" data-side="${side}" data-z="${z}" x="${x0 + side * w + 1.5}" y="${y0 - 1 + z * (h + 6) / 3 + 1.5}" width="${w - 3}" height="${(h + 6) / 3 - 3}" rx="4" tabindex="0"><title>${side ? "Right" : "Left"} ${ZN[z]}</title></rect>`;
+    } else s += `<rect class="tile" data-side="${side}" x="${x0 + side * w + 1.5}" y="${y0 + 0.5}" width="${w - 3}" height="${h + 3}" rx="5" tabindex="0"><title>${side ? "Right" : "Left"} side</title></rect>`;
+  }
+  return s + "</svg>";
+}
+function paintBed(id) {
+  document.querySelectorAll(`[data-bed="${id}"] .tile`).forEach(t => {
+    const side = +t.dataset.side, lv = id === "tb" ? state.tb[side][+t.dataset.z] : state[id][side];
+    t.setAttribute("fill", SHADES[id][lv]);
+  });
+}
+
+/* ---------- Build the table ---------- */
+const cmp = document.getElementById("cmp");
+let html = `<div class="corner" role="columnheader"></div>`;
+P.forEach(p => {
+  html += `<div class="prod ${p.id}" role="columnheader">
+    ${p.id === "tb" ? '<span class="badge">Made for couples</span>' : ""}
+    ${p.id === "tb" ? "" : `<span class="brand">${p.brand}</span>`}
+    <span class="name">${p.id === "tb" ? '<span class="logo">together <em>bed</em></span>' : p.name}</span>
+    <span class="price">${money(p.price)}<small>Queen</small></span>
+    ${p.id === "tb" ? `<span class="save">Save ${money(P[1].price - p.price).replace(".99", "")}–${money(P[2].price - p.price)}</span>` : '<span class="save" style="visibility:hidden">–</span>'}
+    <div class="bedviz" data-bed="${p.id}">${bedSVG(p.id)}</div>
+    <span class="vizcap" id="cap-${p.id}">${p.id === "tb" ? "6 independent zones" : "2 sides, one firmness each"}</span>
+  </div>`;
+});
+ROWS.forEach((r, ri) => {
+  html += `<button type="button" class="rl" data-row="${ri}" aria-expanded="false" aria-controls="d-${ri}" role="rowheader"><b>${r.label}<i aria-hidden="true"></i></b><small>${r.sub}</small></button>`;
+  r.cells.forEach((c, ci) => {
+    const id = P[ci].id;
+    let inner = "";
+    if (c.ways != null) inner = `<div class="ways"><div class="n" data-count="${c.ways}">${c.ways}</div><div class="bar"><i data-w="${Math.max(3, Math.log(c.ways) / Math.log(729) * 100)}"></i></div></div><span class="t dim">${c.t}</span>`;
+    else if (c.price != null) inner = `<span class="price" style="font-size:22px">${money(c.price)}</span>`;
+    else inner = (c.m ? `<span class="mark ${c.m}" aria-label="${MLABEL[c.m]}">${ICON[c.m]}</span>` : "") + `<span class="t${c.m === "n" ? " dim" : ""}">${c.t}</span>`;
+    html += `<div class="cell ${id}" data-row="${ri}" role="cell">${inner}</div>`;
+  });
+  html += `<div class="detail" id="d-${ri}" data-row="${ri}"><div class="dg"><div class="dl"></div>${r.more.map(m => `<div>${m}</div>`).join("")}</div></div>`;
+});
+// tally of clear wins (rows with marks)
+const tally = P.map((p, ci) => ROWS.reduce((n, r) => n + (r.cells[ci].m === "y" ? 1 : r.cells[ci].m === "p" ? 0.5 : 0), 0)), marked = ROWS.filter(r => r.cells[0].m).length;
+html += `<div class="corner cta-l" style="border-top:1px solid var(--line)"></div>`;
+P.forEach((p, ci) => {
+  html += `<div class="cta ${p.id}"><span class="score"><b data-score="${ci}">${String(tally[ci]).replace(/^0\.5$/, "½").replace(".5", "½")}/${marked}</b>features</span>` +
+    (p.id === "tb" ? `<a class="btn" href="${LINKS.design}" target="_top" data-home-ch="9">Design your bed <span aria-hidden="true">→</span></a><a class="ghost" href="${LINKS.shop}" target="_top">Shop TogetherBed</a>`
+                   : `<a class="ghost" href="${p.link}" target="_blank" rel="noopener">View on ${p.brand}</a>`) + `</div>`;
+});
+cmp.insertAdjacentHTML("beforeend", html);
+// the white card behind the TogetherBed column, from its header to its buttons
+const hl = document.querySelector(".col-hl");
+function placeHL() {
+  const a = cmp.querySelector(".prod.tb"), z = cmp.querySelector(".cta.tb"), pad = innerWidth < 760 ? 1 : 2;
+  hl.style.left = a.offsetLeft - pad + "px"; hl.style.width = a.offsetWidth + pad * 2 + "px";
+  hl.style.top = a.offsetTop - 14 + "px"; hl.style.height = z.offsetTop + z.offsetHeight - a.offsetTop + 30 + "px";
+}
+placeHL(); addEventListener("resize", placeHL); new ResizeObserver(placeHL).observe(cmp);
+document.fonts && document.fonts.ready.then(placeHL);
+["tb", "bg", "np"].forEach(paintBed);
+
+/* ---------- Interactions ---------- */
+// zones: tap to step through the levels; the other beds change a whole side at once
+const capDefault = { tb: "6 independent zones", bg: "2 sides, one firmness each", np: "2 sides, one firmness each" };
+const capT = {};
+function flash(id, msg) {
+  const el = document.getElementById("cap-" + id);
+  el.textContent = msg; el.classList.add("flash");
+  clearTimeout(capT[id]); capT[id] = setTimeout(() => { el.textContent = capDefault[id]; el.classList.remove("flash"); }, 2600);
+}
+function stepTile(t) {
+  const id = t.closest("[data-bed]").dataset.bed, side = +t.dataset.side, sideName = side ? "Right" : "Left";
+  if (id === "tb") {
+    const z = +t.dataset.z; state.tb[side][z] = (state.tb[side][z] + 1) % 3;
+    flash(id, `${sideName} ${ZN[z]}: ${LEVELS.tb[state.tb[side][z]]}. The rest stays put.`);
+  } else {
+    state[id][side] = (state[id][side] + 1) % LEVELS[id].length;
+    flash(id, `${sideName} side: ${LEVELS[id][state[id][side]]}, head to foot`);
+  }
+  paintBed(id);
+}
+cmp.addEventListener("click", e => {
+  const t = e.target.closest(".tile"); if (t) { stepTile(t); return; }
+  const rl = e.target.closest(".rl"); if (!rl) return;
+  const d = document.getElementById("d-" + rl.dataset.row), open = rl.getAttribute("aria-expanded") !== "true";
+  rl.setAttribute("aria-expanded", open); d.classList.toggle("open", open);
+});
+cmp.addEventListener("keydown", e => { const t = e.target.closest(".tile"); if (t && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); stepTile(t); } });
+
+// priorities: highlight the rows that matter, dim the rest
+const prioBtns = [...document.querySelectorAll(".prio button")];
+prioBtns.forEach(b => b.addEventListener("click", () => {
+  prioBtns.forEach(x => x.setAttribute("aria-pressed", x === b));
+  const p = b.dataset.p;
+  cmp.querySelectorAll("[data-row]").forEach(el => {
+    const r = ROWS[+el.dataset.row], on = p === "all" || r.tags.includes(p);
+    el.classList.toggle("row-off", !on);
+  });
+  // the feature count follows the rows on show
+  const rows = ROWS.filter(r => r.cells[0].m && (p === "all" || r.tags.includes(p)));
+  document.querySelectorAll("[data-score]").forEach(el => {
+    const ci = +el.dataset.score, n = rows.reduce((t, r) => t + (r.cells[ci].m === "y" ? 1 : r.cells[ci].m === "p" ? 0.5 : 0), 0);
+    el.textContent = `${String(n).replace(/^0\.5$/, "½").replace(".5", "½")}/${rows.length}`;
+  });
+}));
+
+// numbers count up and bars fill once the table is on screen
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+function playWays() {
+  document.querySelectorAll(".ways .bar i").forEach(i => i.style.width = i.dataset.w + "%");
+  document.querySelectorAll("[data-count]").forEach(el => {
+    const to = +el.dataset.count; if (reduce) { el.textContent = to; return; }
+    const t0 = performance.now();
+    const step = now => { const k = Math.min(1, (now - t0) / 1400), e = 1 - Math.pow(1 - k, 3); el.textContent = Math.round(to * e); if (k < 1) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  });
+}
+if ("IntersectionObserver" in window) {
+  const io = new IntersectionObserver(es => { if (es.some(x => x.isIntersecting)) { playWays(); io.disconnect(); } }, { threshold: 0.2 });
+  io.observe(cmp);
+} else playWays();
+
+/* ---------- Site header + mega menu (same as the home page; links go to the home page's chapters) ---------- */
+const HOME = "https://becausemarketing.wixstudio.com/togetherbed";
+const MENU = {
+  how: { script: "How", title: "How it works", blurb: "Five layers, each one tuned to the person who sleeps on it.", all: [2, "Start the tour"], items: [
+    { ch: 2, snap: "nest", t: "The nest", d: "The structured base that holds every piece in place." },
+    { ch: 3, snap: "support", t: "Zoned support", d: "8″ quad coil cubes for shoulders, hips and legs." },
+    { ch: 4, snap: "comfort", t: "Zoned comfort", d: "Natural latex or memory foam cubes, side by side." },
+    { ch: 5, snap: "swap", t: "Swap a cube", d: "Move or replace one piece, not the whole bed." } ] },
+  ed: { script: "Choose", title: "Our models", blurb: "The same zoned design for every sleeper. Built to be updated, never replaced.", all: [6, "Compare editions"], items: [
+    { ch: 6, ed: "performance", snap: "one", img: "https://becausemarketing.sirv.com/Website%20Test/together%20bed%20glb/tgb%20one.png", t: "TogetherBed One", d: "Our new entry-level model.", soon: true },
+    { ch: 6, ed: "performance", snap: "perf", t: "Performance", d: "Cooling stretch cover and HD memory foam." },
+    { ch: 6, ed: "naturals", snap: "nat", t: "Naturals", d: "Natural & cotton cover over natural latex." }
+ ] },
+  make: { script: "Yours", title: "Make your bed", blurb: "Tell us who sleeps in it. We'll set each side and show why it fits.", all: [9, "Design your bed"], items: [
+    { ch: 9, snap: "start", t: "It starts with you", d: "Your build and how you sleep." },
+    { ch: 10, snap: "bed", t: "Your bed", d: "Each side set for its sleeper." },
+    { ch: 11, snap: "report", t: "Fit report", d: "Zone by zone, why it fits." },
+    { ch: 12, snap: "send", t: "Send it to me", d: "Keep your build or share it." } ] }
+};
+// tell the home page which chapter to open (it reads this once when it loads)
+function handoff(ch, ed) { try { sessionStorage.setItem("tb-goto", String(ch)); if (ed) sessionStorage.setItem("tb-ed", ed); } catch (e) {} }
+document.addEventListener("click", e => { const a = e.target.closest("[data-home-ch]"); if (a) handoff(a.dataset.homeCh, a.dataset.ed); });
+
+// Pictures: the home page saves live renders of the bed; until a visitor has been there, simple drawings stand in
+const ISO = (() => {
+  const S = 46, ox = 120, oy = 46;
+  let bx0 = 1e9, by0 = 1e9, bx1 = -1e9, by1 = -1e9;                // bounds of what's drawn, so each picture is framed to fit
+  const P = (x, y, z) => { const q = [ox + (x - y) * 0.866 * S, oy + (x + y) * 0.5 * S - z * S]; bx0 = Math.min(bx0, q[0]); bx1 = Math.max(bx1, q[0]); by0 = Math.min(by0, q[1]); by1 = Math.max(by1, q[1]); return q; };
+  const shade = (hex, k) => { const n = parseInt(hex.slice(1), 16); const f = c => Math.max(0, Math.min(255, Math.round(c * k))); return `rgb(${f(n >> 16)},${f(n >> 8 & 255)},${f(n & 255)})`; };
+  const box = (x, y, z, w, d, h, c, extra = "") => {
+    const pts = a => a.map(p => P(...p).map(v => v.toFixed(1)).join(",")).join(" ");
+    return `<polygon points="${pts([[x, y + d, z], [x + w, y + d, z], [x + w, y + d, z + h], [x, y + d, z + h]])}" fill="${shade(c, .82)}"/>` +
+           `<polygon points="${pts([[x + w, y, z], [x + w, y + d, z], [x + w, y + d, z + h], [x + w, y, z + h]])}" fill="${shade(c, .68)}"/>` +
+           `<polygon points="${pts([[x, y, z + h], [x + w, y, z + h], [x + w, y + d, z + h], [x, y + d, z + h]])}" fill="${c}" stroke="rgba(43,38,48,.12)" stroke-width=".6" ${extra}/>`;
+  };
+  const W = 1.5, L = 2;
+  const nest = (z = 0) => box(0, 0, z, W, L, .42, "#9d99a6") + box(.07, .07, z + .42, W - .14, L - .14, .001, "#6f6b78");
+  const cubes = (z, h, col, lift = {}) => { let s = ""; for (let r = 0; r < 3; r++) for (let c = 0; c < 2; c++) { const k = r * 2 + c, l = lift[k] || [0, 0, 0]; s += box(.09 + c * .67 + l[0], .09 + r * .6 + l[1], z + l[2], .64, .57, h, typeof col === "function" ? col(k) : col); } return s; };
+  const slab = (z, col, h = .06) => box(.05, .05, z, W - .1, L - .1, h, col);
+  const pillows = z => box(.15, .12, z, .55, .3, .1, "#ffffff") + box(.8, .12, z, .55, .3, .1, "#ffffff");
+  const svg = inner => {
+    let w = bx1 - bx0, h = by1 - by0, cx = (bx0 + bx1) / 2, cy = (by0 + by1) / 2;
+    const pad = 1.22; w *= pad; h *= pad; if (w / h > 240 / 170) h = w * 170 / 240; else w = h * 240 / 170;
+    bx0 = by0 = 1e9; bx1 = by1 = -1e9;
+    const vx = cx - w / 2, vy = cy - h / 2;
+    return `<svg viewBox="${vx.toFixed(1)} ${vy.toFixed(1)} ${w.toFixed(1)} ${h.toFixed(1)}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><rect x="${vx}" y="${vy}" width="${w}" height="${h}" fill="#f4f1f7"/>${inner}</svg>`;
+  };
+  const coilCol = k => ["#6c6976", "#55525e", "#6c6976", "#8a8794", "#77747f", "#8a8794"][k];
+  const comfCol = k => ["#f1eff4", "#e6e1ec", "#d8d0e2", "#f1eff4", "#e6e1ec", "#c9bdd6"][k];
+  return {
+    nest: svg(nest()),
+    support: svg(nest() + cubes(.12, .3, coilCol)),
+    comfort: svg(nest() + cubes(.12, .3, coilCol) + cubes(.42, .14, "#efece6")),
+    swap: svg(nest() + cubes(.12, .3, coilCol) + cubes(.42, .14, comfCol, { 1: [.18, .25, .45] })),
+    surface: svg(nest() + cubes(.12, .3, coilCol) + cubes(.42, .14, comfCol) + slab(.62, "#f7f6f9", .04) + slab(.95, "#ffffff", .05)),
+    one: svg(nest() + slab(.42, "#a3a2aa", .14)),
+    perf: svg(nest() + slab(.42, "#eef1f6", .14)),
+    nat: svg(nest() + slab(.42, "#f3efe3", .14)),
+    last: svg(nest(-.1) + cubes(.38, .26, coilCol) + cubes(.82, .13, comfCol) + slab(1.12, "#f7f6f9", .04) + slab(1.36, "#ffffff", .05)),
+    compare: svg(nest(-.3) + cubes(.0, .3, coilCol) + cubes(.6, .14, comfCol)),
+    start: `<svg viewBox="0 0 240 170" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="g2" cx="50%" cy="45%" r="70%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#ebe6f0"/></radialGradient></defs><rect width="240" height="170" fill="url(#g2)"/><g fill="#e9dde6"><ellipse cx="120" cy="38" rx="11" ry="13"/><rect x="104" y="54" width="32" height="46" rx="14"/><rect x="93" y="57" width="9" height="40" rx="4.5"/><rect x="138" y="57" width="9" height="40" rx="4.5"/><rect x="106" y="96" width="12" height="52" rx="6"/><rect x="122" y="96" width="12" height="52" rx="6"/></g><ellipse cx="120" cy="152" rx="34" ry="5" fill="#000" opacity=".08"/></svg>`,
+    bed: svg(nest() + slab(.42, "#e7e2ee", .14) + pillows(.56)),
+    report: svg(nest() + slab(.42, "#e7e2ee", .14) + pillows(.56) + `<path d="M${P(.42, .5, .58).join(",")} L${P(.42, 1.6, .58).join(",")}" stroke="#3f8f6b" stroke-width="3" stroke-linecap="round"/><path d="M${P(1.08, .5, .58).join(",")} L${P(1.08, 1.6, .58).join(",")}" stroke="#3f8f6b" stroke-width="3" stroke-linecap="round"/>`),
+    send: (() => { const b = nest() + slab(.42, "#e7e2ee", .14) + pillows(.56), [px, py] = P(1.25, -0.25, 1.15); P(1.6, -0.6, 1.5);
+      return svg(b + `<g transform="translate(${px.toFixed(1)},${py.toFixed(1)})"><path d="M0 14 L36 0 L22 36 L14 22 Z" fill="#7b6888"/><path d="M14 22 L36 0" stroke="#fff" stroke-width="1.5"/></g>`); })()
+  };
+})();
+let SAVED = {};
+try { SAVED = JSON.parse(localStorage.getItem("tb-snaps") || "{}") || {}; } catch (e) {}
+
+const mmEl = document.getElementById("mm"), mmScrim = document.getElementById("mmScrim"), mmBurger = document.querySelector(".mm-burger");
+const mmTrig = [...document.querySelectorAll(".mm-t")];
+mmEl.querySelector(".mm-in").innerHTML = Object.entries(MENU).map(([g, m]) => `
+  <section class="mm-g" data-g="${g}" id="mm-${g}" aria-label="${m.title}">
+    <div class="mm-intro"><span class="script">${m.script}</span><h3>${m.title}</h3><p>${m.blurb}</p>
+      <a href="${HOME}" target="_top" class="mm-all" data-home-ch="${m.all[0]}">${m.all[1]} <span aria-hidden="true">→</span></a></div>
+    <div class="mm-grid n${m.items.length}">${m.items.map(it => {
+      const here = it.snap === "compare";
+      const pic = it.img ? `<img alt="" src="${it.img}">` : SAVED[it.snap] ? `<img alt="" src="${SAVED[it.snap]}">` : ISO[it.snap] || "";
+      return `<a href="${here ? "#top" : HOME}"${here ? ' aria-current="page"' : ' target="_top"'} class="mm-card" ${here ? "" : `data-home-ch="${it.ch}"`}${it.ed ? ` data-ed="${it.ed}"` : ""}>
+        <span class="mm-img has">${pic}<em>${here ? "this page" : String(it.ch).padStart(2, "0")}</em>${it.soon ? '<i class="mm-soon">Coming soon</i>' : ""}</span>
+        <b>${it.t}</b><small>${it.d}</small></a>`; }).join("")}
+    </div>
+  </section>`).join("");
+let mmGroup = null, mmAll = false, mmCloseT = 0;
+function mmOpen(g, all) {
+  clearTimeout(mmCloseT); mmGroup = g; mmAll = !!all;
+  mmEl.classList.add("open"); mmEl.classList.toggle("all", mmAll); mmScrim.classList.add("on");
+  mmEl.querySelectorAll(".mm-g").forEach(s => s.classList.toggle("on", mmAll || s.dataset.g === g));
+  mmTrig.forEach(b => b.setAttribute("aria-expanded", !mmAll && b.dataset.mm === g ? "true" : "false"));
+  mmBurger.setAttribute("aria-expanded", mmAll ? "true" : "false");
+}
+function mmClose(focusBack) {
+  if (!mmEl.classList.contains("open")) return;
+  const g = mmGroup;
+  mmEl.classList.remove("open"); mmScrim.classList.remove("on"); mmGroup = null;
+  mmTrig.forEach(b => b.setAttribute("aria-expanded", "false")); mmBurger.setAttribute("aria-expanded", "false");
+  if (focusBack) (mmAll ? mmBurger : mmTrig.find(b => b.dataset.mm === g))?.focus();
+}
+const topEl = document.querySelector(".top");
+const mmLater = () => { clearTimeout(mmCloseT); mmCloseT = setTimeout(() => { if (!mmAll) mmClose(); }, 220); };
+const canHoverMenu = matchMedia("(hover: hover) and (pointer: fine)").matches;
+mmTrig.forEach(b => {
+  if (canHoverMenu) b.addEventListener("mouseenter", () => mmOpen(b.dataset.mm));
+  b.addEventListener("click", e => { e.preventDefault(); mmGroup === b.dataset.mm && !mmAll ? mmClose() : mmOpen(b.dataset.mm); });
+});
+topEl.addEventListener("mouseleave", e => { if (canHoverMenu && !mmEl.contains(e.relatedTarget)) mmLater(); });
+mmEl.addEventListener("mouseenter", () => clearTimeout(mmCloseT));
+mmEl.addEventListener("mouseleave", e => { if (canHoverMenu && !topEl.contains(e.relatedTarget)) mmLater(); });
+mmBurger.addEventListener("click", () => mmAll && mmEl.classList.contains("open") ? mmClose() : mmOpen(null, true));
+mmScrim.addEventListener("click", () => mmClose());
+mmEl.addEventListener("click", e => { if (e.target.closest('[aria-current="page"]')) { e.preventDefault(); mmClose(); scrollTo({ top: 0, behavior: "smooth" }); } });
+document.addEventListener("keydown", e => { if (e.key === "Escape") mmClose(true); });
+addEventListener("scroll", () => { if (!mmAll) mmClose(); }, { passive: true });
+</script>
+</body>
+</html>
